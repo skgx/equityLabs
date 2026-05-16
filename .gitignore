@@ -9,7 +9,7 @@ target/
 *.iml
 *.ipr
 .env
-./docs
+docs/
 
 ### Eclipse ###
 .apt_generated
