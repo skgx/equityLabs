@@ -21,6 +21,7 @@
     <modules>
         <module>order-service</module>
         <module>matching-engine</module>
+        <module>docs</module>
     </modules>
 
     <properties>
