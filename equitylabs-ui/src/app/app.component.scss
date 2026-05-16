@@ -1,0 +1,142 @@
+.main-nav {
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-lg);
+  z-index: 1000;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: var(--spacing-xl);
+  cursor: pointer;
+
+  .logo-icon {
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+    color: var(--color-primary);
+  }
+
+  .logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text-primary);
+
+    .highlight {
+      color: var(--color-primary);
+    }
+  }
+}
+
+.market-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+
+  .dot {
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+
+  &.live {
+    color: var(--color-success);
+    .dot {
+      background: var(--color-success);
+    }
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--spacing-xs);
+  height: 100%;
+
+  button {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.025em;
+    border-radius: 0;
+    height: 56px;
+    padding: 0 16px;
+    transition: var(--transition);
+
+    &:hover {
+      color: var(--text-primary);
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    &.active {
+      color: var(--color-primary);
+      box-shadow: inset 0 -2px 0 var(--color-primary);
+    }
+  }
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: var(--spacing-xl);
+
+  button {
+    color: var(--text-secondary);
+  }
+
+  .login-btn {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .signup-btn {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .logout-link {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    
+    &:hover {
+      color: var(--color-danger);
+    }
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #fff;
+    font-size: 11px;
+  }
+}
+
+.content-area {
+  min-height: calc(100vh - 56px);
+  background-color: var(--bg-primary);
+}

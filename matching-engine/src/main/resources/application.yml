@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: matching-engine
+
+  # Redis Configuration (Local Docker) via .env
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+      ssl:
+        enabled: false
+
+  # Kafka Configuration (Local Docker) via .env
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+    consumer:
+      group-id: matching-engine-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "in.equitylabs.engine.model"
+
+server:
+  port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    in.equitylabs.engine: DEBUG

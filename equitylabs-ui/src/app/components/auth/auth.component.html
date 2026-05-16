@@ -1,0 +1,88 @@
+<div class="auth-container">
+  <mat-card class="auth-card">
+    <div class="auth-header">
+      <h2 class="auth-title">{{ isLoginMode() ? 'Welcome Back' : 'Join EquityLabs' }}</h2>
+      <p class="auth-subtitle">
+        {{ isLoginMode() ? 'Log in to manage your portfolio' : 'Start your trading journey today' }}
+      </p>
+    </div>
+
+    <div class="auth-content-wrapper">
+      <div class="auth-slider" [@slideInOut]="isLoginMode() ? 'login' : 'signup'">
+        
+        <!-- LOG IN FORM -->
+        <div class="auth-slide">
+          <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="auth-form" *ngIf="isLoginMode()" @fadeInOut>
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" name="email" [(ngModel)]="loginData.email" required placeholder="john@example.com">
+              <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Password</mat-label>
+              <input matInput type="password" name="password" [(ngModel)]="loginData.password" required placeholder="Your password">
+              <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+
+            <div class="forgot-password">
+              <a href="javascript:void(0)">Forgot password?</a>
+            </div>
+
+            <button mat-flat-button color="primary" type="submit" [disabled]="!loginForm.valid" class="submit-btn">
+              Log In
+            </button>
+
+            <div class="auth-footer">
+              New to EquityLabs? <a href="javascript:void(0)" (click)="toggleMode()">Create account</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- SIGN UP FORM -->
+        <div class="auth-slide">
+          <form (ngSubmit)="onSignup()" #signupForm="ngForm" class="auth-form" *ngIf="!isLoginMode()" @fadeInOut>
+            <mat-form-field appearance="outline">
+              <mat-label>Full Name</mat-label>
+              <input matInput name="fullName" [(ngModel)]="signupData.fullName" required placeholder="John Doe">
+              <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Username</mat-label>
+              <input matInput name="username" [(ngModel)]="signupData.username" required placeholder="johndoe">
+              <mat-icon matSuffix>alternate_email</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" name="email" [(ngModel)]="signupData.email" required placeholder="john@example.com">
+              <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Password</mat-label>
+              <input matInput type="password" name="password" [(ngModel)]="signupData.password" required placeholder="Min 8 characters">
+              <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Confirm Password</mat-label>
+              <input matInput type="password" name="confirmPassword" [(ngModel)]="signupData.confirmPassword" required placeholder="Repeat password">
+              <mat-icon matSuffix>security</mat-icon>
+            </mat-form-field>
+
+            <button mat-flat-button color="primary" type="submit" [disabled]="!signupForm.valid" class="submit-btn">
+              Create Account
+            </button>
+
+            <div class="auth-footer">
+              Already have an account? <a href="javascript:void(0)" (click)="toggleMode()">Log in</a>
+            </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </mat-card>
+</div>

@@ -1,0 +1,57 @@
+<div class="markets-shell">
+  <!-- SIDEBAR -->
+  <aside class="stocks-sidebar">
+    <div 
+      class="stock-row" 
+      *ngFor="let item of marketItems()" 
+      [class.selected]="item.symbol === selectedSymbol()"
+      (click)="selectSymbol(item.symbol)"
+    >
+      <div class="stock-info">
+        <span class="symbol">{{ item.displayName }}</span>
+        <span class="full-name">{{ item.symbol.replace('.NS', '') }}</span>
+      </div>
+      <div class="stock-price text-right">
+        <span class="price mono">{{ formatCurrency(item.price) }}</span>
+        <span class="change mono" [ngClass]="item.changePercent >= 0 ? 'positive' : 'negative'">
+          {{ item.changePercent >= 0 ? '+' : '' }}{{ item.changePercent.toFixed(2) }}%
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CHART AREA -->
+  <main class="chart-area">
+    <!-- CHART HEADER -->
+    <header class="chart-header" *ngIf="getSelectedStockData() as stock">
+      <div class="stock-meta">
+        <h2 class="mono">{{ stock.displayName }}</h2>
+        <span class="divider">|</span>
+        <span class="price mono">{{ formatCurrency(stock.price) }}</span>
+        <span class="change mono" [ngClass]="stock.changePercent >= 0 ? 'positive' : 'negative'">
+          {{ stock.changePercent >= 0 ? '▲' : '▼' }} {{ stock.changePercent.toFixed(2) }}%
+        </span>
+      </div>
+
+      <div class="range-selector">
+        <button 
+          *ngFor="let r of ranges" 
+          mat-button 
+          [class.active]="r.range === selectedRange()"
+          (click)="selectRange(r.range)"
+        >
+          {{ r.label }}
+        </button>
+      </div>
+    </header>
+
+    <!-- CHART CONTAINER -->
+    <div class="chart-wrapper">
+      <app-stock-chart 
+        [symbol]="selectedSymbol()" 
+        [range]="selectedRange()" 
+        [interval]="selectedInterval()"
+      ></app-stock-chart>
+    </div>
+  </main>
+</div>

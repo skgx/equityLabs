@@ -1,0 +1,34 @@
+<div class="book-panel">
+  <div class="book-header">
+    <span class="text-xs text-muted">PRICE</span>
+    <span class="text-xs text-muted text-right">QUANTITY</span>
+    <span class="text-xs text-muted text-right">TOTAL</span>
+  </div>
+
+  <div class="scroll-container">
+    <!-- ASKS (Sell) -->
+    <div class="side asks">
+      <div class="row" *ngFor="let ask of orderBook?.asks?.slice()?.reverse()">
+        <span class="price text-danger mono text-sm">{{ ask.price | number:'1.2-2' }}</span>
+        <span class="qty mono text-sm text-right text-secondary">{{ ask.quantity }}</span>
+        <span class="total mono text-sm text-right text-secondary">{{ (ask.price * ask.quantity) | number:'1.0-0' }}</span>
+        <div class="depth-bar ask-bar" [style.width.%]="(ask.quantity / maxQty) * 100"></div>
+      </div>
+    </div>
+
+    <div class="spread-row" *ngIf="orderBook">
+      <div class="spread-val mono">{{ spread | number:'1.2-2' }}</div>
+      <div class="spread-label text-xs text-muted">SPREAD ({{ (spread / midPrice * 100) | number:'1.2-2' }}%)</div>
+    </div>
+
+    <!-- BIDS (Buy) -->
+    <div class="side bids">
+      <div class="row" *ngFor="let bid of orderBook?.bids">
+        <span class="price text-success mono text-sm">{{ bid.price | number:'1.2-2' }}</span>
+        <span class="qty mono text-sm text-right text-secondary">{{ bid.quantity }}</span>
+        <span class="total mono text-sm text-right text-secondary">{{ (bid.price * bid.quantity) | number:'1.0-0' }}</span>
+        <div class="depth-bar bid-bar" [style.width.%]="(bid.quantity / maxQty) * 100"></div>
+      </div>
+    </div>
+  </div>
+</div>

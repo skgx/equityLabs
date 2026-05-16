@@ -1,0 +1,26 @@
+<div class="ticker-wrapper" *ngIf="showTicker()">
+  <div class="ticker-container" (mouseenter)="pauseScroll = true" (mouseleave)="pauseScroll = false">
+    <div class="ticker-track" [class.paused]="pauseScroll">
+      <!-- Original List -->
+      <div class="ticker-card" *ngFor="let item of tickerData()">
+        <div class="ticker-info">
+          <span class="symbol">{{ item.displayName }}</span>
+          <span class="price mono">{{ item.price | number:'1.2-2' }}</span>
+        </div>
+        <div class="change" [ngClass]="item.change >= 0 ? 'positive' : 'negative'">
+          {{ item.changePercent | number:'1.2-2' }}%
+        </div>
+      </div>
+      <!-- Duplicate for Seamless Loop -->
+      <div class="ticker-card" *ngFor="let item of tickerData()">
+        <div class="ticker-info">
+          <span class="symbol">{{ item.displayName }}</span>
+          <span class="price mono">{{ item.price | number:'1.2-2' }}</span>
+        </div>
+        <div class="change" [ngClass]="item.change >= 0 ? 'positive' : 'negative'">
+          {{ item.changePercent | number:'1.2-2' }}%
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

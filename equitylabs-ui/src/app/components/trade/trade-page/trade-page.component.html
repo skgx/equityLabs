@@ -1,0 +1,64 @@
+<div class="trade-layout">
+  <!-- Watchlist Panel -->
+  <aside class="sidebar-panel watchlist">
+    <div class="panel-header">
+      <span class="text-xs font-bold text-secondary">WATCHLIST</span>
+    </div>
+    <div class="watchlist-content">
+      <div class="watchlist-item" *ngFor="let item of watchlist()" 
+           [class.active]="item.symbol.startsWith(selectedSymbol)"
+           (click)="selectStock(item.symbol)">
+        <div class="item-info">
+          <span class="symbol text-base font-bold">{{ item.displayName }}</span>
+        </div>
+        <div class="item-data">
+          <span class="price mono text-sm">{{ item.price | number:'1.2-2' }}</span>
+          <span class="change text-xs" [ngClass]="item.change >= 0 ? 'text-success' : 'text-danger'">
+            {{ item.change >= 0 ? '+' : '' }}{{ item.changePercent | number:'1.2-2' }}%
+          </span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Center Content: Chart & History -->
+  <main class="center-panel">
+    <div class="chart-section">
+      <header class="chart-header" *ngIf="getSelectedStock() as stock">
+        <div class="symbol-info">
+          <span class="text-lg font-bold">{{ stock.displayName }}</span>
+          <div class="timeframes">
+            <button *ngFor="let tf of timeframes" 
+                    class="tf-btn" 
+                    [class.active]="selectedInterval() === tf.interval"
+                    (click)="selectTimeframe(tf)">
+              {{ tf.label }}
+            </button>
+          </div>
+        </div>
+        <div class="legend-box mono text-xs">
+          <div class="legend-item"><span class="text-muted">Price:</span> {{ stock.price | number:'1.2-2' }}</div>
+          <div class="legend-item"><span class="text-muted">Change:</span> <span [ngClass]="stock.change >= 0 ? 'text-success' : 'text-danger'">{{ stock.changePercent | number:'1.2-2' }}%</span></div>
+        </div>
+      </header>
+      
+      <div class="chart-container">
+        <app-stock-chart [symbol]="selectedSymbol" [range]="selectedRange()" [interval]="selectedInterval()"></app-stock-chart>
+      </div>
+    </div>
+
+    <div class="trades-section">
+      <app-trade-feed [symbol]="selectedSymbol"></app-trade-feed>
+    </div>
+  </main>
+
+  <!-- Right Panel: Execution -->
+  <aside class="sidebar-panel execution">
+    <div class="order-form-section">
+      <app-order-form [symbol]="selectedSymbol"></app-order-form>
+    </div>
+    <div class="order-book-section">
+      <app-order-book [symbol]="selectedSymbol"></app-order-book>
+    </div>
+  </aside>
+</div>

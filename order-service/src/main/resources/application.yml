@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: order-service
+  main:
+    web-application-type: reactive
+
+  # Database Configuration (Neon/PostgreSQL) via .env
+  r2dbc:
+    url: ${DATABASE_URL:r2dbc:postgresql://neondb_owner:npg_Ds67gGiCXoTF@ep-autumn-leaf-aqq9shvj-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require}
+    username: ${DATABASE_USER:neondb_owner}
+    password: ${DATABASE_PASSWORD:npg_Ds67gGiCXoTF}
+    properties:
+      sslMode: REQUIRE
+
+  # Flyway for database migrations via .env
+  flyway:
+    url: ${FLYWAY_URL:jdbc:postgresql://ep-autumn-leaf-aqq9shvj-pooler.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require}
+    user: ${DATABASE_USER:neondb_owner}
+    password: ${DATABASE_PASSWORD:npg_Ds67gGiCXoTF}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # Kafka Configuration (Local Docker) via .env
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+    consumer:
+      group-id: order-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "in.equitylabs.orders.model"
+
+  # Redis Configuration (Local Docker) via .env
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+      ssl:
+        enabled: false
+
+# Gemini AI Configuration via .env
+gemini:
+  api-key: ${GEMINI_API_KEY:your-actual-key-here}
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    db:
+      enabled: true
+  security:
+    enabled: false
+
+logging:
+  level:
+    in.equitylabs.orders: DEBUG
+    org.springframework.data.r2dbc: DEBUG

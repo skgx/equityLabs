@@ -1,0 +1,62 @@
+<div class="order-card">
+  <div class="card-header">
+    <span class="text-xs font-bold text-secondary">{{ currentSymbol }} POSITION</span>
+  </div>
+
+  <div class="type-toggle">
+    <button type="button" class="toggle-btn buy" [class.active]="isBuy" (click)="setOrderType(OrderType.BUY)">BUY</button>
+    <button type="button" class="toggle-btn sell" [class.active]="!isBuy" (click)="setOrderType(OrderType.SELL)">SELL</button>
+  </div>
+
+  <form [formGroup]="orderForm" (ngSubmit)="submitOrder()" class="order-form">
+    <div class="input-section">
+      <div class="input-row">
+        <label class="text-xs text-secondary">CATEGORY</label>
+        <mat-form-field appearance="outline" class="form-field-compact">
+          <mat-select formControlName="orderCategory">
+            <mat-option value="LIMIT">LIMIT</mat-option>
+            <mat-option value="MARKET">MARKET</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="input-row">
+        <label class="text-xs text-secondary">PRICE</label>
+        <input type="number" formControlName="price" class="form-input mono text-sm" placeholder="0.00" 
+               [readonly]="orderForm.get('orderCategory')?.value === OrderCategory.MARKET">
+      </div>
+
+      <div class="input-row">
+        <label class="text-xs text-secondary">QUANTITY</label>
+        <input type="number" formControlName="quantity" class="form-input mono text-sm" placeholder="0">
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="summary-section">
+      <div class="summary-row highlight">
+        <span class="text-xs font-bold">Total Value</span>
+        <span class="text-lg font-bold mono" [ngClass]="isBuy ? 'text-primary' : 'text-danger'">{{ totalValue | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <button type="submit" class="execution-btn" [ngClass]="isBuy ? 'buy-btn' : 'sell-btn'" [disabled]="!orderForm.valid">
+      {{ isBuy ? 'BUY' : 'SELL' }} {{ currentSymbol }}
+    </button>
+  </form>
+
+  <div class="ai-insights">
+    <div class="insights-header">
+      <mat-icon class="icon">psychology</mat-icon>
+      <span class="text-xs font-bold">GEMINI ANALYTICS</span>
+    </div>
+    <div class="insights-body">
+      <mat-progress-bar mode="indeterminate" *ngIf="isAiLoading" class="mini-progress"></mat-progress-bar>
+      <p class="explanation text-sm mono" *ngIf="aiExplanation">{{ aiExplanation }}</p>
+      <p class="placeholder text-xs text-muted" *ngIf="!aiExplanation && !isAiLoading">
+        Enter order details for AI analysis...
+      </p>
+    </div>
+  </div>
+</div>
