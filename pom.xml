@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>4.0.0</version>
         <relativePath/>
     </parent>
     
@@ -21,7 +21,6 @@
     <modules>
         <module>order-service</module>
         <module>matching-engine</module>
-        <module>docs</module>
     </modules>
 
     <properties>

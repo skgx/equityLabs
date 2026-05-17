@@ -14,8 +14,9 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class TradeFeedComponent implements OnInit, OnDestroy, OnChanges {
   @Input() symbol: string = 'RELIANCE.NS';
-  trades: Trade[] = [];
+  trades: any[] = [];
   private tradeSub?: Subscription;
+  private readonly CURRENT_USER = 'demo-user';
 
   constructor(private tradeService: TradeService) {}
 
@@ -32,13 +33,31 @@ export class TradeFeedComponent implements OnInit, OnDestroy, OnChanges {
   private subscribeToTrades() {
     if (this.tradeSub) {
       this.tradeSub.unsubscribe();
-      this.tradeService.unsubscribe(this.symbol); // Note: this might need logic to track old symbol
+      this.tradeService.unsubscribe(this.symbol);
     }
 
-    this.trades = []; // Clear old trades
+    this.trades = []; 
     this.tradeSub = this.tradeService.subscribeToTrades(this.symbol).subscribe({
       next: (trade) => {
-        this.trades = [trade, ...this.trades].slice(0, 50);
+        console.log('Trade received:', trade);
+        const newEntries: any[] = [];
+
+        // Logic: If user is buyer, add a BUY entry. If user is seller, add a SELL entry.
+        // If user is both (self-match), they will see both entries as requested.
+        // If user is neither, add a generic TRADE entry.
+
+        if (trade.buyUserId === this.CURRENT_USER) {
+          newEntries.push({ ...trade, displaySide: 'BUY' });
+        }
+        if (trade.sellUserId === this.CURRENT_USER) {
+          newEntries.push({ ...trade, displaySide: 'SELL' });
+        }
+        
+        if (trade.buyUserId !== this.CURRENT_USER && trade.sellUserId !== this.CURRENT_USER) {
+          newEntries.push({ ...trade, displaySide: 'TRADE' });
+        }
+
+        this.trades = [...newEntries, ...this.trades].slice(0, 50);
       },
       error: (err) => console.error('WebSocket error:', err)
     });

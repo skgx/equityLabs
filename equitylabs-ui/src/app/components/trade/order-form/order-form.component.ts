@@ -12,7 +12,6 @@ import { OrderService } from '../../../services/order.service';
 import { AiService } from '../../../services/ai.service';
 import { TickerService } from '../../../services/ticker.service';
 import { OrderType, OrderCategory } from '../../../models/trade.models';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-order-form',
@@ -56,8 +55,6 @@ export class OrderFormComponent implements OnChanges {
       quantity: [10, [Validators.required, Validators.min(1)]]
     });
 
-    this.setupAiExplanation();
-    
     // Auto-update price when ticker data changes for the selected symbol
     effect(() => {
       const tickers = this.tickerService.tickerData();
@@ -66,6 +63,25 @@ export class OrderFormComponent implements OnChanges {
         this.orderForm.patchValue({ price: currentTicker.price }, { emitEvent: false });
       }
     });
+  }
+
+  analyzeOrder() {
+    if (this.orderForm.valid) {
+      this.isAiLoading = true;
+      this.aiExplanation = '';
+      this.aiService.explainOrder(this.orderForm.value).subscribe({
+        next: (res) => {
+          this.aiExplanation = res.explanation;
+          this.isAiLoading = false;
+        },
+        error: () => {
+          this.aiExplanation = 'AI Analysis currently unavailable. Please try again later.';
+          this.isAiLoading = false;
+        }
+      });
+    } else {
+      this.snackBar.open('Please fill order details before analysis.', 'OK', { duration: 3000 });
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -97,43 +113,25 @@ export class OrderFormComponent implements OnChanges {
     this.orderForm.patchValue({ orderType: type });
   }
 
-  setupAiExplanation() {
-    this.orderForm.valueChanges.pipe(
-      debounceTime(1500),
-      distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-      switchMap(values => {
-        if (this.orderForm.valid) {
-          this.isAiLoading = true;
-          this.aiExplanation = '';
-          return this.aiService.explainOrder(values);
-        }
-        return [];
-      })
-    ).subscribe({
-      next: (res) => {
-        this.aiExplanation = res.explanation;
-        this.isAiLoading = false;
-      },
-      error: () => this.isAiLoading = false
-    });
-  }
-
   submitOrder() {
     if (this.orderForm.valid) {
       const orderData = this.orderForm.value;
       this.orderService.createOrder(orderData).subscribe({
         next: (res) => {
-          this.snackBar.open(
-            `Successfully placed ${orderData.orderType} order for ${orderData.quantity} units of ${orderData.symbol}`,
-            'Dismiss',
-            {
-              duration: 5000,
-              horizontalPosition: 'right',
-              verticalPosition: 'top',
-              panelClass: [this.isBuy ? 'buy-toast' : 'sell-toast']
-            }
-          );
-          console.log('Order submitted:', res);
+          if (res.status === 'ACCEPTED') {
+            this.snackBar.open(
+              `Successfully placed ${orderData.orderType} order for ${orderData.quantity} units of ${orderData.symbol}`,
+              'Dismiss',
+              {
+                duration: 5000,
+                horizontalPosition: 'right',
+                verticalPosition: 'top',
+                panelClass: [this.isBuy ? 'buy-toast' : 'sell-toast']
+              }
+            );
+          } else {
+            this.snackBar.open('Order Failed: ' + res.message, 'Close', { duration: 5000 });
+          }
         },
         error: (err) => {
           this.snackBar.open('Error placing order. Please check your connection.', 'Close', {
@@ -144,6 +142,8 @@ export class OrderFormComponent implements OnChanges {
           console.error('Submission error:', err);
         }
       });
+    } else {
+      this.snackBar.open('Please fill all order details correctly (Price must be > 0)', 'OK', { duration: 3000 });
     }
   }
 }

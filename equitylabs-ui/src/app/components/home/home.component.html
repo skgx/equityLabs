@@ -1,106 +1,113 @@
 <div class="home-container">
-  <!-- HERO SECTION -->
+  <!-- Hero Section -->
   <section class="hero-section">
-    <div class="live-badge">
-      <span class="dot">●</span> LIVE MARKET
-    </div>
-    
-    <h1 class="hero-title">
-      Match Trades.<br>
-      <span class="accent">Analyse Every Move.</span>
-    </h1>
-    
-    <p class="hero-subtitle">
-      EquityLabs is a simulated stock broker where users can place orders, 
-      watch real-time matching, track their portfolio, and get Gemini AI insights.
-    </p>
-    
-    <div class="hero-actions">
-      <button mat-flat-button color="primary" routerLink="/terminal">Start Trading</button>
-      <button mat-stroked-button routerLink="/markets">View Markets</button>
-    </div>
-    
-    <div class="hero-stats">
-      <div class="stat-item">
-        <span class="stat-value">< 1ms</span>
-        <span class="stat-label">Match Latency</span>
+    <div class="hero-content">
+      <h1 class="hero-title">Match Trades.<br>Analyze Every Move.</h1>
+      <p class="hero-description">
+        EquityLabs is a real-time stock trading simulator where you can execute trades, track live market data, and analyze your trading performance with AI-powered insights.
+      </p>
+      <div class="hero-ctas">
+        <button *ngIf="!authService.isAuthenticated()" class="btn-primary" routerLink="/auth">SIGN UP FREE</button>
+        <button *ngIf="authService.isAuthenticated()" class="btn-primary" routerLink="/terminal">START TRADING</button>
+        <button class="btn-outline" routerLink="/markets">VIEW MARKETS</button>
       </div>
-      <div class="divider"></div>
-      <div class="stat-item">
-        <span class="stat-value">NSE</span>
-        <span class="stat-label">Exchange Simulated</span>
+    </div>
+    <div class="hero-visual">
+      <!-- High-precision visualization placeholder -->
+      <div class="floating-data-card p1">
+        <div class="card-header">NIFTY 50</div>
+        <div class="card-price text-success">24,358.10</div>
+        <div class="card-chart"></div>
       </div>
-      <div class="divider"></div>
-      <div class="stat-item">
-        <span class="stat-value">Real-Time</span>
-        <span class="stat-label">AI Insights</span>
+      <div class="floating-data-card p2">
+        <div class="card-header">ORDER FILLED</div>
+        <div class="card-body">100 RELIANCE @ 2,945.50</div>
       </div>
     </div>
   </section>
 
-  <!-- FEATURE CARDS -->
-  <section class="features-grid">
-    <div class="feature-card" routerLink="/terminal">
-      <mat-icon>terminal</mat-icon>
-      <h3>Trading Terminal</h3>
-      <p>Place LIMIT and MARKET orders, watch orderbook matching.</p>
-    </div>
-    
-    <div class="feature-card" routerLink="/markets">
-      <mat-icon>show_chart</mat-icon>
-      <h3>Live Charts</h3>
-      <p>Candlestick charts for NSE stocks, 1D to 5Y ranges.</p>
-    </div>
-    
-    <div class="feature-card" routerLink="/portfolio">
-      <mat-icon>account_balance_wallet</mat-icon>
-      <h3>Portfolio Tracker</h3>
-      <p>Holdings, unrealised P&L, average buy price, trade history.</p>
-    </div>
-    
-    <div class="feature-card" routerLink="/analytics">
-      <mat-icon>psychology</mat-icon>
-      <h3>AI Analytics</h3>
-      <p>Gemini market summaries, order explanations, anomaly detection.</p>
-    </div>
-  </section>
-
-  <!-- MARKET SNAPSHOT TABLE -->
-  <section class="market-snapshot">
+  <!-- Market Overview Section -->
+  <section class="market-section">
     <div class="section-header">
-      <h2>Market Snapshot</h2>
-      <div class="spacer"></div>
-      <span class="currency-note">Prices in ₹</span>
+      <h2 class="section-title">Market Overview</h2>
+      <p class="section-subtitle">Real-time snapshots of top Indian equities</p>
     </div>
 
-    <div class="table-container">
-      <table class="snapshot-table">
-        <thead>
-          <tr>
-            <th>Symbol</th>
-            <th class="text-right">Price (₹)</th>
-            <th class="text-right">Change</th>
-            <th class="text-right">% Change</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngIf="isLoading()">
-            <td colspan="4" class="loading-cell">
-              <div class="loading-spinner">Fetching live data...</div>
-            </td>
-          </tr>
-          <tr *ngFor="let item of marketData()">
-            <td class="symbol-cell">{{ item.displayName }}</td>
-            <td class="price-cell text-right mono">{{ formatCurrency(item.price) }}</td>
-            <td class="change-cell text-right mono" [ngClass]="item.change >= 0 ? 'positive' : 'negative'">
-              {{ item.change >= 0 ? '+' : '' }}{{ item.change.toFixed(2) }}
-            </td>
-            <td class="percent-cell text-right mono" [ngClass]="item.changePercent >= 0 ? 'positive' : 'negative'">
-              {{ formatPercent(item.changePercent) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="market-grid">
+      <div class="ticker-card trade-card" *ngFor="let item of watchlist().slice(0, 8)" (click)="selectStock(item.symbol)">
+        <div class="ticker-info">
+          <span class="ticker-symbol font-bold">{{ item.displayName }}</span>
+          <span class="ticker-name text-xs text-secondary">{{ item.symbol }}</span>
+        </div>
+        <div class="ticker-data">
+          <span class="ticker-price mono text-base">{{ item.price | number:'1.2-2' }}</span>
+          <span class="ticker-change text-xs" [ngClass]="item.change >= 0 ? 'text-success' : 'text-danger'">
+            {{ item.change >= 0 ? '+' : '' }}{{ item.changePercent | number:'1.2-2' }}%
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-footer">
+      <button mat-button class="btn-outline" routerLink="/markets">VIEW ALL MARKETS</button>
     </div>
   </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2 class="section-title">Engineered for Precision</h2>
+      <p class="section-subtitle">The tech stack behind EquityLabs</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card trade-card">
+        <mat-icon class="feature-icon">bolt</mat-icon>
+        <h3 class="feature-title">Sub-Millisecond Matching</h3>
+        <p class="feature-text text-sm text-secondary">Real-time order execution with &lt;1ms latency using our event-driven matching engine.</p>
+      </div>
+      <div class="feature-card trade-card">
+        <mat-icon class="feature-icon">bar_chart</mat-icon>
+        <h3 class="feature-title">Live Market Data</h3>
+        <p class="feature-text text-sm text-secondary">NSE-simulated real-time price feeds across 20+ stocks with precision charting.</p>
+      </div>
+      <div class="feature-card trade-card">
+        <mat-icon class="feature-icon">psychology</mat-icon>
+        <h3 class="feature-title">AI-Powered Analytics</h3>
+        <p class="feature-text text-sm text-secondary">Gemini 1.5 Flash insights on trading patterns, order fills, and performance metrics.</p>
+      </div>
+      <div class="feature-card trade-card">
+        <mat-icon class="feature-icon">account_balance_wallet</mat-icon>
+        <h3 class="feature-title">Portfolio Tracking</h3>
+        <p class="feature-text text-sm text-secondary">Track your positions, P&L, and historical trading metrics in a consolidated real-time dashboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Section -->
+  <section class="cta-banner">
+    <div class="cta-content">
+      <h2 class="cta-title">Ready to Start Trading?</h2>
+      <p class="cta-text">Join thousands of traders simulating the Indian markets.</p>
+      <div class="cta-buttons">
+        <button class="btn-primary" routerLink="/auth">SIGN UP NOW</button>
+        <button class="btn-outline" routerLink="/markets">VIEW MARKETS</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="logo-text">EQUITY<span class="highlight">LABS</span></span>
+        <p class="text-xs text-secondary mt-2">© 2026 EquityLabs Simulator. All rights reserved.</p>
+      </div>
+      <div class="footer-links">
+        <a routerLink="/home">Home</a>
+        <a routerLink="/markets">Markets</a>
+        <a routerLink="/terminal">Terminal</a>
+      </div>
+    </div>
+  </footer>
 </div>

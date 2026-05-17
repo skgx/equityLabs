@@ -1,62 +1,93 @@
-<div class="order-card">
-  <div class="card-header">
-    <span class="text-xs font-bold text-secondary">{{ currentSymbol }} POSITION</span>
-  </div>
+<div class="order-container trade-card">
+  <!-- Sticky Header -->
+  <header class="order-header">
+    <span class="symbol-name font-bold">{{ symbol }} POSITION</span>
+  </header>
 
-  <div class="type-toggle">
-    <button type="button" class="toggle-btn buy" [class.active]="isBuy" (click)="setOrderType(OrderType.BUY)">BUY</button>
-    <button type="button" class="toggle-btn sell" [class.active]="!isBuy" (click)="setOrderType(OrderType.SELL)">SELL</button>
-  </div>
-
-  <form [formGroup]="orderForm" (ngSubmit)="submitOrder()" class="order-form">
-    <div class="input-section">
-      <div class="input-row">
-        <label class="text-xs text-secondary">CATEGORY</label>
-        <mat-form-field appearance="outline" class="form-field-compact">
-          <mat-select formControlName="orderCategory">
-            <mat-option value="LIMIT">LIMIT</mat-option>
-            <mat-option value="MARKET">MARKET</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="input-row">
-        <label class="text-xs text-secondary">PRICE</label>
-        <input type="number" formControlName="price" class="form-input mono text-sm" placeholder="0.00" 
-               [readonly]="orderForm.get('orderCategory')?.value === OrderCategory.MARKET">
-      </div>
-
-      <div class="input-row">
-        <label class="text-xs text-secondary">QUANTITY</label>
-        <input type="number" formControlName="quantity" class="form-input mono text-sm" placeholder="0">
-      </div>
+  <div class="scroll-content">
+    <!-- Action Toggles -->
+    <div class="action-toggles">
+      <button type="button" class="toggle-btn buy" [class.active]="isBuy" (click)="setOrderType(OrderType.BUY)">BUY</button>
+      <button type="button" class="toggle-btn sell" [class.active]="!isBuy" (click)="setOrderType(OrderType.SELL)">SELL</button>
     </div>
 
-    <div class="divider"></div>
-
-    <div class="summary-section">
-      <div class="summary-row highlight">
-        <span class="text-xs font-bold">Total Value</span>
-        <span class="text-lg font-bold mono" [ngClass]="isBuy ? 'text-primary' : 'text-danger'">{{ totalValue | number:'1.2-2' }}</span>
+    <!-- Main Form -->
+    <form [formGroup]="orderForm" class="order-form">
+      <div class="form-row">
+        <label>Category</label>
+        <select formControlName="orderCategory" class="form-input">
+          <option [value]="OrderCategory.LIMIT">LIMIT</option>
+          <option [value]="OrderCategory.MARKET">MARKET</option>
+        </select>
       </div>
-    </div>
 
-    <button type="submit" class="execution-btn" [ngClass]="isBuy ? 'buy-btn' : 'sell-btn'" [disabled]="!orderForm.valid">
-      {{ isBuy ? 'BUY' : 'SELL' }} {{ currentSymbol }}
-    </button>
-  </form>
+      <div class="form-row">
+        <label>Price</label>
+        <input type="number" formControlName="price" class="form-input mono" placeholder="0.00">
+      </div>
 
-  <div class="ai-insights">
-    <div class="insights-header">
-      <mat-icon class="icon">psychology</mat-icon>
-      <span class="text-xs font-bold">GEMINI ANALYTICS</span>
-    </div>
-    <div class="insights-body">
-      <mat-progress-bar mode="indeterminate" *ngIf="isAiLoading" class="mini-progress"></mat-progress-bar>
-      <p class="explanation text-sm mono" *ngIf="aiExplanation">{{ aiExplanation }}</p>
-      <p class="placeholder text-xs text-muted" *ngIf="!aiExplanation && !isAiLoading">
-        Enter order details for AI analysis...
-      </p>
+      <div class="form-row">
+        <label>Quantity</label>
+        <input type="number" formControlName="quantity" class="form-input mono" placeholder="0">
+      </div>
+
+      <div class="total-display">
+        <span class="label">Total Value</span>
+        <span class="value mono">{{ totalValue | number:'1.2-2' }}</span>
+      </div>
+
+      <button type="button" 
+              class="execution-btn" 
+              [class.buy]="isBuy" 
+              [class.sell]="!isBuy"
+              (click)="submitOrder()">
+        {{ isBuy ? 'PLACE BUY ORDER' : 'PLACE SELL ORDER' }}
+      </button>
+    </form>
+
+    <!-- Scrollable Detail Sections -->
+    <div class="detail-sections">
+      <!-- Spread Section -->
+      <section class="detail-card spread-section">
+        <div class="section-header">
+          <mat-icon>compare_arrows</mat-icon>
+          <span class="text-xs font-bold">MARKET SPREAD</span>
+        </div>
+        <div class="spread-data">
+          <div class="data-item">
+            <span class="text-secondary text-xs">BID</span>
+            <span class="mono text-success">2,945.10</span>
+          </div>
+          <div class="spread-indicator">
+            <div class="spread-bar"></div>
+            <span class="spread-val mono">0.40</span>
+          </div>
+          <div class="data-item">
+            <span class="text-secondary text-xs">ASK</span>
+            <span class="mono text-danger">2,945.50</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI Insights Section -->
+      <section class="detail-card ai-section">
+        <div class="section-header">
+          <div class="header-left">
+            <mat-icon>psychology</mat-icon>
+            <span class="text-xs font-bold">GEMINI ANALYTICS</span>
+          </div>
+          <button type="button" class="analyze-btn" (click)="analyzeOrder()" [disabled]="isAiLoading">
+            {{ isAiLoading ? '...' : 'ANALYZE' }}
+          </button>
+        </div>
+        <div class="ai-body">
+          <mat-progress-bar mode="indeterminate" *ngIf="isAiLoading" class="mini-loader"></mat-progress-bar>
+          <p class="explanation text-sm" *ngIf="aiExplanation">{{ aiExplanation }}</p>
+          <p class="placeholder text-xs text-muted" *ngIf="!aiExplanation && !isAiLoading">
+            Ready for execution analysis...
+          </p>
+        </div>
+      </section>
     </div>
   </div>
 </div>

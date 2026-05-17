@@ -6,14 +6,17 @@ import in.equitylabs.engine.model.Order;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/market")
 @RequiredArgsConstructor
@@ -27,7 +30,14 @@ public class MarketController {
         return Mono.just(
                 matchEngine.getOrderBook(symbol)
                         .map(book -> ResponseEntity.ok(convertToResponse(book)))
-                        .orElse(ResponseEntity.notFound().build())
+                        .orElseGet(() -> {
+                            log.info("Order book for symbol {} is currently empty", symbol);
+                            return ResponseEntity.ok(OrderBookResponse.builder()
+                                    .symbol(symbol)
+                                    .bids(Collections.emptyList())
+                                    .asks(Collections.emptyList())
+                                    .build());
+                        })
         );
     }
 

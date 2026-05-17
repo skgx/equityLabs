@@ -1,56 +1,177 @@
 .trade-layout {
   display: grid;
-  grid-template-columns: 240px 1fr 340px;
-  height: calc(100vh - 54px - 56px); /* Subtract Header and Ticker height if present */
+  /* Columns are: Watchlist | Center | Resizer | Execution */
+  height: calc(100vh - 110px); 
   background-color: var(--bg-primary);
   overflow: hidden;
-}
+  position: relative;
 
-.sidebar-panel {
-  border-right: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  background-color: var(--bg-primary);
+  @media (max-width: 1200px) {
+    /* Reduce widths but keep resizer col */
+    grid-template-columns: 200px 1fr 4px 280px !important;
+  }
 
-  &.execution {
-    border-right: none;
-    border-left: 1px solid var(--border-color);
+  @media (max-width: 1024px) {
+    /* Hide watchlist */
+    grid-template-columns: 0px 1fr 4px 280px !important;
+    .watchlist { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    /* Stack layout for mobile/small screens */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    
+    .watchlist, .resizer-h, .resizer-v { display: none; }
+    
+    .center-container {
+      height: 500px !important;
+      flex: none;
+    }
+
+    .execution {
+      width: 100% !important;
+      flex: 1;
+    }
+    
+    .trades-section {
+      height: 250px !important;
+    }
   }
 }
 
+.sidebar-panel {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  height: 100%;
+  overflow-y: auto; /* Changed from hidden to auto */
+
+  &.watchlist {
+    border-right: 1px solid var(--border-color);
+    overflow-y: hidden; /* Keep watchlist internal scroll */
+  }
+
+  &.execution {
+    border-left: 1px solid var(--border-color);
+    /* overflow-y: auto; inherited from above */
+  }
+}
+
+.center-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--border-color);
+}
+
+.chart-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+
+.trades-section {
+  background: var(--bg-primary);
+  overflow: hidden;
+  min-height: 100px;
+}
+
+/* --- Invisible Resizer Bars - Visible on Hover --- */
+
+.resizer-h {
+  width: 6px;
+  cursor: col-resize;
+  background: transparent;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  position: relative;
+  
+  /* The "phantom" line that appears on hover */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 2px;
+    width: 2px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+
+  &:hover::after, &.active::after {
+    background: var(--color-primary);
+    box-shadow: 0 0 10px var(--color-primary), 0 0 20px var(--color-primary);
+  }
+}
+
+.resizer-v {
+  height: 6px;
+  cursor: row-resize;
+  background: transparent;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 2px;
+    height: 2px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+
+  &:hover::after, &.active::after {
+    background: var(--color-primary);
+    box-shadow: 0 0 10px var(--color-primary), 0 0 20px var(--color-primary);
+  }
+}
+
+/* --- Content Styles Refactored for Zoom Stability --- */
+
 .panel-header {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-color);
   background-color: rgba(255, 255, 255, 0.02);
+  white-space: nowrap;
+  font-size: 0.7rem;
+  letter-spacing: 0.05rem;
 }
 
 .watchlist-content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-sm);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
+  padding: 0; /* Remove padding for edge-to-edge partitions */
 }
 
 .watchlist-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-md);
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.2s ease;
+  position: relative;
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.03);
-    border-color: var(--border-color);
   }
 
   &.active {
     background-color: rgba(59, 130, 246, 0.08);
-    border-color: rgba(59, 130, 246, 0.3);
+    border-left: 3px solid var(--color-primary);
+    padding-left: calc(1rem - 3px);
   }
 
   .item-info {
@@ -67,105 +188,44 @@
   }
 }
 
-.center-panel {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border-right: 1px solid var(--border-color);
-}
-
-.chart-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border-bottom: 1px solid var(--border-color);
-}
-
 .chart-header {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 0.5rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: rgba(255, 255, 255, 0.01);
   border-bottom: 1px solid var(--border-color);
-
-  .symbol-info {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xl);
-  }
-}
-
-.timeframes {
-  display: flex;
-  gap: var(--spacing-xs);
-
-  .tf-btn {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    padding: 4px 10px;
-    font-size: 11px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: var(--transition);
-
-    &:hover {
-      border-color: var(--text-muted);
-      color: var(--text-primary);
-    }
-
-    &.active {
-      background: var(--color-primary);
-      border-color: var(--color-primary);
-      color: white;
-    }
-  }
-}
-
-.legend-box {
-  display: flex;
-  gap: var(--spacing-lg);
+  flex-wrap: nowrap;
+  overflow: hidden;
+  gap: 1rem;
 }
 
 .chart-container {
   flex: 1;
   background-color: #0c1015;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-
-  .chart-grid {
-    position: absolute;
-    inset: 0;
-    background-image: 
-      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
-  .chart-watermark {
-    font-size: 120px;
-    font-weight: 800;
-    color: rgba(255, 255, 255, 0.02);
-    user-select: none;
-  }
+  min-height: 0; /* Important for flex child in zoom */
 }
 
-.trades-section {
-  height: 300px;
-  overflow: hidden;
+.order-form-section {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .order-book-section {
   flex: 1;
   overflow: hidden;
+  min-height: 200px;
 }
 
-.order-form-section {
-  padding: var(--spacing-md);
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+.blur-content {
+  filter: blur(4px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Global scrollbar for the trade layout */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2d3f55 transparent;
 }

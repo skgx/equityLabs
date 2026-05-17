@@ -1,6 +1,15 @@
-<div class="portfolio-container dark-theme">
-  <h1>Your Portfolio</h1>
-  <div class="placeholder-card">
-    <p>Holdings and P&L will appear here once connected to order-service.</p>
+<div class="portfolio-page">
+  <div class="auth-overlay" *ngIf="!authService.isAuthenticated()">
+    <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: var(--accent-primary); margin-bottom: 16px;">lock</mat-icon>
+    <h2 class="text-lg font-bold">Portfolio is Locked</h2>
+    <p class="text-secondary text-sm">Sign in to manage your holdings and track performance.</p>
+    <button class="btn-primary mt-4" routerLink="/auth">SIGN IN TO ACCESS</button>
+  </div>
+
+  <div class="portfolio-container" [class.blur-content]="!authService.isAuthenticated()">
+    <h1 class="page-title">Your Portfolio</h1>
+    <div class="trade-card placeholder-card">
+      <p class="text-secondary">Holdings and P&L will appear here once connected to order-service.</p>
+    </div>
   </div>
 </div>

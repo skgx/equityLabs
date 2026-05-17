@@ -1,39 +1,34 @@
 <ng-container *ngIf="!isAuthPage()">
   <mat-toolbar class="main-nav">
-    <div class="brand" routerLink="/home">
-      <mat-icon class="logo-icon positive">trending_up</mat-icon>
-      <span class="logo-text">EQUITY<span class="highlight">LABS</span></span>
-    </div>
+    <div class="nav-container">
+      <!-- Left: Logo -->
+      <div class="brand" routerLink="/home">
+        <span class="logo-text">EQUITY<span class="highlight">LABS</span></span>
+      </div>
 
-    <div class="market-badge" [ngClass]="{'live': marketStatus === 'LIVE'}">
-      <span class="dot"></span>
-      {{ marketStatus }}
-    </div>
+      <!-- Center: Navigation Links -->
+      <nav class="nav-links">
+        <a routerLink="/home" routerLinkActive="active">HOME</a>
+        <a routerLink="/markets" routerLinkActive="active">MARKETS</a>
+        <a routerLink="/terminal" routerLinkActive="active">TERMINAL</a>
+        <a routerLink="/portfolio" routerLinkActive="active">PORTFOLIO</a>
+        <a routerLink="/analytics" routerLinkActive="active">ANALYTICS</a>
+      </nav>
 
-    <span class="spacer"></span>
-
-    <nav class="nav-links">
-      <button mat-button routerLink="/home" routerLinkActive="active">HOME</button>
-      <button mat-button routerLink="/terminal" routerLinkActive="active" *ngIf="authService.isAuthenticated()">TERMINAL</button>
-      <button mat-button routerLink="/markets" routerLinkActive="active" *ngIf="authService.isAuthenticated()">MARKETS</button>
-      <button mat-button routerLink="/portfolio" routerLinkActive="active" *ngIf="authService.isAuthenticated()">PORTFOLIO</button>
-      <button mat-button routerLink="/analytics" routerLinkActive="active" *ngIf="authService.isAuthenticated()">ANALYTICS</button>
-    </nav>
-
-    <div class="user-profile">
-      <ng-container *ngIf="authService.isAuthenticated(); else authLinks">
-        <button mat-icon-button>
-          <mat-icon>notifications</mat-icon>
-        </button>
-        <div class="avatar" routerLink="/profile" style="cursor: pointer;">
-          {{ getInitials() }}
-        </div>
-        <button mat-button (click)="onLogout()" class="logout-link">LOGOUT</button>
-      </ng-container>
-      <ng-template #authLinks>
-        <button mat-button routerLink="/auth" class="login-btn">LOGIN</button>
-        <button mat-flat-button color="primary" routerLink="/auth" class="signup-btn">SIGN UP</button>
-      </ng-template>
+      <!-- Right: User Menu -->
+      <div class="user-menu">
+        <ng-container *ngIf="authService.isAuthenticated(); else guestLink">
+          <div class="user-profile" routerLink="/profile">
+            <span class="username">{{ authService.currentUser()?.username }}</span>
+            <div class="avatar">
+              {{ getInitials() }}
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #guestLink>
+          <button class="btn-primary btn-sm" routerLink="/auth">SIGN IN</button>
+        </ng-template>
+      </div>
     </div>
   </mat-toolbar>
 

@@ -1,88 +1,79 @@
 .ticker-wrapper {
-  background: var(--bg-primary);
+  height: 56px;
+  background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
-  height: 54px;
   overflow: hidden;
   display: flex;
   align-items: center;
-  position: relative;
-  z-index: 100;
 }
 
 .ticker-container {
   width: 100%;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .ticker-track {
-  display: flex;
-  width: max-content;
+  display: inline-flex;
+  gap: 12px;
+  padding: 0 16px;
   animation: scroll 60s linear infinite;
-  gap: var(--spacing-lg);
-  padding: 0 var(--spacing-lg);
-  
-  &.paused {
+
+  &:hover {
     animation-play-state: paused;
   }
 }
 
 .ticker-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
-  white-space: nowrap;
-  gap: 16px;
-  background: rgba(255, 255, 255, 0.02);
+  min-width: 140px; /* Increased and changed to min-width to prevent overflow */
+  padding: 8px 14px;
+  background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
   transition: var(--transition);
+  flex-shrink: 0; /* Ensure boxes don't shrink */
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px rgba(0, 208, 132, 0.2);
   }
 
   .ticker-info {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-
+    justify-content: space-between;
+    align-items: baseline;
+    
     .symbol {
-      color: var(--text-secondary);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
+      color: var(--text-secondary);
       text-transform: uppercase;
     }
 
     .price {
+      font-size: 13px;
+      font-weight: 700;
       color: var(--text-primary);
-      font-size: 14px;
-      font-weight: 600;
     }
   }
 
   .change {
-    font-size: 13px;
-    font-weight: 500;
-    font-family: var(--font-mono);
-
-    &.positive {
-      color: var(--color-success);
-      &::before { content: '+'; }
-    }
-    &.negative {
-      color: var(--color-danger);
-    }
+    font-size: 11px;
+    font-weight: 600;
+    text-align: right;
+    
+    &.positive { color: var(--success); }
+    &.negative { color: var(--error); }
   }
 }
 
 @keyframes scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }

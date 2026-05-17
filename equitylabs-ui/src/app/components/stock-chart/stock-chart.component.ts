@@ -66,6 +66,7 @@ export class StockChartComponent implements AfterViewInit, OnChanges, OnDestroy 
 
   private chart: IChartApi | null = null;
   private candleSeries: ISeriesApi<'Candlestick'> | null = null;
+  private resizeObserver: ResizeObserver | null = null;
   private http = inject(HttpClient);
 
   isLoading = signal<boolean>(false);
@@ -77,6 +78,7 @@ export class StockChartComponent implements AfterViewInit, OnChanges, OnDestroy 
     // Delay initialization slightly to ensure container dimensions are ready
     setTimeout(() => {
       this.initChart();
+      this.setupResizeObserver();
       this.loadData();
     }, 0);
   }
@@ -91,16 +93,38 @@ export class StockChartComponent implements AfterViewInit, OnChanges, OnDestroy 
     if (this.chart) {
       this.chart.remove();
     }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
   }
 
   @HostListener('window:resize')
   onResize() {
+    this.triggerResize();
+  }
+
+  private triggerResize() {
     if (this.chart && this.chartContainer) {
-      this.chart.applyOptions({
-        width: this.chartContainer.nativeElement.clientWidth,
-        height: this.chartContainer.nativeElement.clientHeight
-      });
+      const { clientWidth, clientHeight } = this.chartContainer.nativeElement;
+      if (clientWidth > 0 && clientHeight > 0) {
+        this.chart.applyOptions({
+          width: clientWidth,
+          height: clientHeight
+        });
+        this.chart.timeScale().fitContent();
+      }
     }
+  }
+
+  private setupResizeObserver() {
+    if (!this.chartContainer) return;
+
+    this.resizeObserver = new ResizeObserver(() => {
+      // Use requestAnimationFrame to throttle resize calls during smooth drag
+      requestAnimationFrame(() => this.triggerResize());
+    });
+
+    this.resizeObserver.observe(this.chartContainer.nativeElement);
   }
 
   private initChart() {

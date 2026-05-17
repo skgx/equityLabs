@@ -19,6 +19,7 @@ public class WebSocketConfig {
         // Note: The UI tries to connect to /ws/trades/{symbol}
         // For simplicity, we'll route all trades to /ws/trades
         map.put("/ws/trades/**", tradeStreamHandler);
+        map.put("/ws/orders/**", tradeStreamHandler);
 
         SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
         mapping.setUrlMap(map);

@@ -1,6 +1,47 @@
-<div class="analytics-container dark-theme">
-  <h1>Gemini AI Analytics</h1>
-  <div class="placeholder-card">
-    <p>Gemini AI insights will appear here once connected to matching-engine.</p>
+<div class="analytics-page">
+  <div class="auth-overlay" *ngIf="!authService.isAuthenticated()">
+    <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: var(--accent-primary); margin-bottom: 16px;">lock</mat-icon>
+    <h2 class="text-lg font-bold">AI Analytics is Locked</h2>
+    <p class="text-secondary text-sm">Sign in to EquityLabs to access Gemini-powered market insights.</p>
+    <button class="btn-primary mt-4" routerLink="/auth">SIGN IN TO ACCESS</button>
+  </div>
+
+  <div class="analytics-container" [class.blur-content]="!authService.isAuthenticated()">
+    <header class="analytics-header">
+      <div class="title-section">
+        <mat-icon class="ai-icon">psychology</mat-icon>
+        <h1>Gemini AI Insights</h1>
+      </div>
+      <button class="btn-primary" (click)="runFullAnalysis()" [disabled]="isLoading()">
+        {{ isLoading() ? 'Analysing Market...' : 'Run New Analysis' }}
+      </button>
+    </header>
+
+    <div class="insights-grid">
+      <!-- Market Summary Card -->
+      <div class="insight-card summary">
+        <div class="card-label">MARKET SUMMARY ({{ symbol }})</div>
+        <mat-progress-bar mode="indeterminate" *ngIf="isLoading() && !summary()" class="card-loader"></mat-progress-bar>
+        <p class="content mono text-sm" *ngIf="summary()">{{ summary() }}</p>
+        <p class="placeholder text-xs" *ngIf="!summary() && !isLoading()">Click run for market context...</p>
+      </div>
+
+      <!-- Smart Suggestion Card -->
+      <div class="insight-card suggestion">
+        <div class="card-label">TRADING SUGGESTION</div>
+        <mat-progress-bar mode="indeterminate" *ngIf="isLoading() && !suggestion()" class="card-loader"></mat-progress-bar>
+        <p class="content mono text-sm" *ngIf="suggestion()">{{ suggestion() }}</p>
+        <p class="placeholder text-xs" *ngIf="!suggestion() && !isLoading()">Awaiting market signals...</p>
+      </div>
+
+      <!-- Historical Context -->
+      <div class="insight-card context">
+        <div class="card-label">HISTORICAL CONTEXT</div>
+        <p class="content text-xs text-secondary">
+          Gemini is referencing recent orders in Kafka and R2DBC to estimate execution probability. 
+          Analysis includes volume spikes and price deviation from historical averages.
+        </p>
+      </div>
+    </div>
   </div>
 </div>

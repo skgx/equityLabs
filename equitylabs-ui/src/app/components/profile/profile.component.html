@@ -1,1 +1,103 @@
-<p>profile works!</p>
+<div class="profile-page" *ngIf="authService.currentUser() as user">
+  <div class="profile-grid">
+    
+    <!-- Header Section -->
+    <header class="profile-header trade-card">
+      <div class="header-left">
+        <div class="avatar-lg">{{ user.fullName[0] }}</div>
+        <div class="user-meta">
+          <h1>{{ user.fullName }}</h1>
+          <p class="text-secondary">@{{ user.username }}</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-outline btn-sm">EDIT PROFILE</button>
+        <button class="icon-btn"><mat-icon>more_horiz</mat-icon></button>
+      </div>
+    </header>
+
+    <!-- Content Sections -->
+    <div class="sections-container">
+      
+      <!-- Account Info -->
+      <section class="profile-section trade-card">
+        <h3 class="section-title">Account Information</h3>
+        <div class="info-list">
+          <div class="info-item">
+            <span class="label">Email Address</span>
+            <span class="value">{{ user.email }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Username</span>
+            <span class="value">@{{ user.username }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">User ID</span>
+            <span class="value mono text-xs">{{ user.userId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Account Status</span>
+            <span class="value text-success">VERIFIED <mat-icon class="text-xs">verified</mat-icon></span>
+          </div>
+          <div class="info-item">
+            <span class="label">Joined</span>
+            <span class="value text-secondary">Jan 2026</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trading Stats -->
+      <section class="profile-section trade-card">
+        <h3 class="section-title">Trading Statistics</h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="label">Total Trades</span>
+            <span class="value">42</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Win Rate</span>
+            <span class="value text-success">62.5%</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Total P&L</span>
+            <span class="value text-success">+$2,450.00</span>
+          </div>
+          <div class="stat-card">
+            <span class="label">Balance</span>
+            <span class="value text-gold">$5,000.00</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Account Settings -->
+      <section class="profile-section trade-card">
+        <h3 class="section-title">Account Settings</h3>
+        <div class="settings-list">
+          <button class="setting-item">
+            <mat-icon>lock_reset</mat-icon>
+            <span>Change Password</span>
+          </button>
+          <button class="setting-item">
+            <mat-icon>security</mat-icon>
+            <span>Two-Factor Authentication</span>
+            <span class="badge warn">OFF</span>
+          </button>
+          <button class="setting-item">
+            <mat-icon>notifications_active</mat-icon>
+            <span>Notification Preferences</span>
+          </button>
+          <button class="setting-item">
+            <mat-icon>privacy_tip</mat-icon>
+            <span>Privacy Settings</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Logout -->
+      <button class="logout-btn" (click)="logout()">
+        <mat-icon>logout</mat-icon> LOG OUT
+      </button>
+
+    </div>
+  </div>
+</div>

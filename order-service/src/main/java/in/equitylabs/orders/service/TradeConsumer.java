@@ -23,43 +23,55 @@ public class TradeConsumer {
 
     @KafkaListener(topics = "trades-out", groupId = "order-service-group")
     public void consumeTrade(Trade trade) {
-        log.info("TRADE RECEIVED: ID={} | SYMBOL={} | PRICE={} | QTY={}", 
+        log.info("TRADE RECEIVED FROM KAFKA: ID={} | SYMBOL={} | PRICE={} | QTY={}", 
                 trade.getTradeId(), trade.getSymbol(), trade.getExecutedPrice(), trade.getQuantity());
 
-        // Broadcast to UI via WebSocket
+        // Broadcast trade for the trade feed (Chart)
         tradeStreamHandler.broadcastTrade(trade);
 
-        // We use .subscribe() because Kafka listeners are not blocking/awaiting the reactive flow
-        processTrade(trade).subscribe();
+        // Process trade updates and broadcast order fill notifications
+        processTrade(trade)
+                .doOnError(e -> log.error("Error processing trade {}: {}", trade.getTradeId(), e.getMessage()))
+                .subscribe();
     }
 
     @Transactional
     public Mono<Void> processTrade(Trade trade) {
-        // 1. Save the trade for historical records
+        log.info("Processing trade matches for orders: BUY={} SELL={}", trade.getBuyOrderId(), trade.getSellOrderId());
+        
         return tradeRepository.save(trade)
                 .then(updateOrder(trade.getBuyOrderId(), trade.getQuantity()))
                 .then(updateOrder(trade.getSellOrderId(), trade.getQuantity()))
                 .then(geminiService.analyzeTradeAnomaly(
                         trade.getSymbol(), 
                         trade.getExecutedPrice().doubleValue(), 
-                        trade.getExecutedPrice().doubleValue(), // Stub avg price
+                        trade.getExecutedPrice().doubleValue(), 
                         trade.getQuantity(), 
-                        trade.getQuantity() // Stub avg qty
-                ).doOnNext(anomaly -> log.info("AI Trade Analysis: {}", anomaly)))
+                        trade.getQuantity()
+                ).doOnNext(anomaly -> log.info("AI Trade Analysis for {}: {}", trade.getSymbol(), anomaly)))
                 .then();
     }
 
     private Mono<Void> updateOrder(String orderId, Integer filledQty) {
+        if (orderId == null) return Mono.empty();
+        
         return orderRepository.findById(orderId)
                 .flatMap(order -> {
-                    int newRemaining = order.getRemainingQty() - filledQty;
+                    int oldRemaining = order.getRemainingQty();
+                    int newRemaining = Math.max(0, oldRemaining - filledQty);
                     order.setRemainingQty(newRemaining);
                     order.setStatus(newRemaining == 0 ? "FILLED" : "PARTIALLY_FILLED");
                     order.setNew(false);
                     
-                    log.info("Updating order {}: status={}, remainingQty={}", orderId, order.getStatus(), newRemaining);
-                    return orderRepository.save(order);
+                    log.info("ORDER UPDATE: ID={} | STATUS={} | REMAINING={}", orderId, order.getStatus(), newRemaining);
+                    
+                    return orderRepository.save(order)
+                            .doOnNext(saved -> {
+                                log.info("BROADCASTING ORDER UPDATE: ID={} status={}", saved.getOrderId(), saved.getStatus());
+                                tradeStreamHandler.broadcastOrderUpdate(saved);
+                            });
                 })
+                .switchIfEmpty(Mono.fromRunnable(() -> log.warn("Order not found in DB: {}", orderId)))
                 .then();
     }
 }

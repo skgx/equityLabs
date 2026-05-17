@@ -1,37 +1,43 @@
-<div class="trades-panel">
-  <div class="panel-header">
-    <span class="text-xs font-bold">RECENT TRADES</span>
-  </div>
+<div class="trades-panel trade-card">
+  <header class="panel-header">
+    <span class="text-xs font-bold text-secondary">RECENT TRADES</span>
+  </header>
   
   <div class="table-container">
-    <table class="trades-table">
+    <table class="trades-table" *ngIf="trades.length > 0">
       <thead>
         <tr>
-          <th class="text-xs text-muted">PRICE</th>
-          <th class="text-xs text-muted">QUANTITY</th>
-          <th class="text-xs text-muted">TIME</th>
-          <th class="text-xs text-muted">TYPE</th>
+          <th>PRICE</th>
+          <th>QUANTITY</th>
+          <th>TIME</th>
+          <th>SIDE</th>
         </tr>
       </thead>
-      <tbody *ngIf="trades.length > 0">
-        <tr *ngFor="let trade of trades">
-          <td class="mono text-sm text-right" [ngClass]="trade.buyUserId === 'demo-user' ? 'text-success' : 'text-danger'">
+      <tbody>
+        <tr *ngFor="let trade of trades" class="trade-row">
+          <td class="mono text-sm" 
+              [class.text-success]="trade.displaySide === 'BUY'"
+              [class.text-danger]="trade.displaySide === 'SELL'"
+              [class.text-primary]="trade.displaySide === 'TRADE'">
             {{ trade.executedPrice | number:'1.2-2' }}
           </td>
-          <td class="mono text-sm text-right">{{ trade.quantity }}</td>
-          <td class="mono text-sm text-right text-secondary">{{ trade.tradedAt | date:'HH:mm:ss' }}</td>
+          <td class="mono text-sm">{{ trade.quantity }}</td>
+          <td class="mono text-sm text-secondary">{{ trade.tradedAt | date:'HH:mm:ss' }}</td>
           <td class="text-center">
-            <span class="type-badge" [ngClass]="trade.buyUserId === 'demo-user' ? 'buy' : 'sell'">
-              {{ trade.buyUserId === 'demo-user' ? 'BUY' : 'SELL' }}
+            <span class="type-badge" 
+                  [class.buy]="trade.displaySide === 'BUY'"
+                  [class.sell]="trade.displaySide === 'SELL'"
+                  [class.neutral]="trade.displaySide === 'TRADE'">
+              {{ trade.displaySide }}
             </span>
           </td>
         </tr>
       </tbody>
     </table>
 
+    <!-- Clean Empty State -->
     <div class="empty-state" *ngIf="trades.length === 0">
-      <mat-icon class="icon">history</mat-icon>
-      <p class="text-sm text-muted">No trades yet</p>
+      <p class="text-sm text-secondary">No trades yet</p>
     </div>
   </div>
 </div>

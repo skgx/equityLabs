@@ -1,5 +1,6 @@
 package in.equitylabs.orders.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,15 +33,18 @@ public class Order implements Persistable<String> {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     @Transient
     @Builder.Default
     private boolean isNew = true;
 
+    @JsonIgnore
     @Override
     public String getId() {
         return orderId;
     }
 
+    @JsonIgnore
     @Override
     public boolean isNew() {
         return isNew;

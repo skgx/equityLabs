@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
+import { NotificationService } from './services/notification.service';
 import { TickerBarComponent } from './components/ticker-bar/ticker-bar.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs/operators';
@@ -29,6 +30,7 @@ export class AppComponent {
   title = 'EquityLabs';
   marketStatus = 'LIVE';
   authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
   private router = inject(Router);
 
   // Track the current route to hide navbar/ticker on /auth
@@ -40,6 +42,10 @@ export class AppComponent {
   );
 
   isAuthPage = computed(() => this.currentUrl()?.includes('/auth'));
+
+  constructor() {
+    this.notificationService.init();
+  }
 
   getInitials(): string {
     const user = this.authService.currentUser();

@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/auth/**", "/actuator/**", "/ws/trades/**").permitAll()
+                        .pathMatchers("/api/auth/**", "/actuator/**", "/ws/trades/**", "/ws/orders/**").permitAll()
                         .anyExchange().permitAll() // Temporarily permit all for local play until full JWT filter implemented
                 );
         return http.build();

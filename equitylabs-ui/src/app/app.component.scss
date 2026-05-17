@@ -1,142 +1,99 @@
 .main-nav {
   background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
-  height: 56px;
+  height: 64px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
-  padding: 0 var(--spacing-lg);
   z-index: 1000;
+  position: relative;
+}
+
+.nav-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-right: var(--spacing-xl);
   cursor: pointer;
-
-  .logo-icon {
-    font-size: 24px;
-    height: 24px;
-    width: 24px;
-    color: var(--color-primary);
-  }
-
   .logo-text {
-    font-size: 16px;
+    font-family: var(--font-heading);
     font-weight: 700;
-    letter-spacing: 0.05em;
+    font-size: 1.5rem;
+    letter-spacing: -1px;
     color: var(--text-primary);
-
-    .highlight {
-      color: var(--color-primary);
-    }
+    .highlight { color: var(--accent-primary); }
   }
-}
-
-.market-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-
-  .dot {
-    height: 6px;
-    width: 6px;
-    border-radius: 50%;
-    background: var(--text-muted);
-  }
-
-  &.live {
-    color: var(--color-success);
-    .dot {
-      background: var(--color-success);
-    }
-  }
-}
-
-.spacer {
-  flex: 1 1 auto;
 }
 
 .nav-links {
   display: flex;
-  gap: var(--spacing-xs);
-  height: 100%;
-
-  button {
-    font-size: 12px;
-    font-weight: 500;
+  gap: 32px;
+  
+  a {
     color: var(--text-secondary);
-    letter-spacing: 0.025em;
-    border-radius: 0;
-    height: 56px;
-    padding: 0 16px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 0;
+    position: relative;
     transition: var(--transition);
 
-    &:hover {
-      color: var(--text-primary);
-      background-color: rgba(255, 255, 255, 0.02);
-    }
+    &:hover { color: var(--text-primary); }
 
     &.active {
-      color: var(--color-primary);
-      box-shadow: inset 0 -2px 0 var(--color-primary);
+      color: var(--accent-primary);
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: var(--accent-primary);
+        box-shadow: 0 0 10px var(--accent-primary);
+      }
     }
   }
 }
 
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-left: var(--spacing-xl);
+.user-menu {
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 20px;
+    transition: var(--transition);
 
-  button {
-    color: var(--text-secondary);
-  }
+    &:hover { background: rgba(255, 255, 255, 0.05); }
 
-  .login-btn {
-    font-size: 13px;
-    font-weight: 600;
-  }
+    .username { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 
-  .signup-btn {
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .logout-link {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-muted);
-    
-    &:hover {
-      color: var(--color-danger);
+    .avatar {
+      width: 32px;
+      height: 32px;
+      background-color: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-primary);
     }
   }
 
-  .avatar {
-    width: 32px;
-    height: 32px;
-    background: var(--color-primary);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    color: #fff;
-    font-size: 11px;
-  }
+  .btn-sm { padding: 8px 16px; font-size: 12px; }
 }
 
 .content-area {
-  min-height: calc(100vh - 56px);
-  background-color: var(--bg-primary);
+  height: calc(100vh - 64px - 56px); /* Navbar + Ticker */
 }

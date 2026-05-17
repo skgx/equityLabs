@@ -1,4 +1,7 @@
-<div class="trade-layout">
+<div class="trade-layout" 
+     [style.grid-template-columns]="'240px 1fr 4px ' + executionWidth() + 'px'"
+     [style.grid-template-rows]="'100%'">
+  
   <!-- Watchlist Panel -->
   <aside class="sidebar-panel watchlist">
     <div class="panel-header">
@@ -21,9 +24,17 @@
     </div>
   </aside>
 
-  <!-- Center Content: Chart & History -->
-  <main class="center-panel">
+  <!-- Center Content: Chart & Terminal -->
+  <div class="center-container">
     <div class="chart-section">
+      <!-- Unauthenticated Overlay -->
+      <div class="auth-overlay" *ngIf="!authService.isAuthenticated()">
+        <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: var(--color-accent); margin-bottom: 16px;">lock</mat-icon>
+        <h2 class="text-lg font-bold">Trading is Locked</h2>
+        <p class="text-secondary text-sm">Sign in to EquityLabs to access live trading features.</p>
+        <button class="btn-primary" routerLink="/auth">SIGN IN TO TRADE</button>
+      </div>
+
       <header class="chart-header" *ngIf="getSelectedStock() as stock">
         <div class="symbol-info">
           <span class="text-lg font-bold">{{ stock.displayName }}</span>
@@ -47,17 +58,29 @@
       </div>
     </div>
 
-    <div class="trades-section">
+    <!-- Vertical Resizer -->
+    <div class="resizer-v" (mousedown)="startVerticalDrag($event)"></div>
+
+    <div class="trades-section" [style.height.px]="terminalHeight()">
       <app-trade-feed [symbol]="selectedSymbol"></app-trade-feed>
     </div>
-  </main>
+  </div>
+
+  <!-- Horizontal Resizer -->
+  <div class="resizer-h" (mousedown)="startHorizontalDrag($event)"></div>
 
   <!-- Right Panel: Execution -->
   <aside class="sidebar-panel execution">
-    <div class="order-form-section">
+    <!-- Unauthenticated Overlay for Execution -->
+    <div class="auth-overlay" *ngIf="!authService.isAuthenticated()">
+      <p class="text-secondary text-sm">Sign in to place orders</p>
+      <button class="btn-primary btn-sm" routerLink="/auth">SIGN IN</button>
+    </div>
+
+    <div class="order-form-section" [class.blur-content]="!authService.isAuthenticated()">
       <app-order-form [symbol]="selectedSymbol"></app-order-form>
     </div>
-    <div class="order-book-section">
+    <div class="order-book-section" [class.blur-content]="!authService.isAuthenticated()">
       <app-order-book [symbol]="selectedSymbol"></app-order-book>
     </div>
   </aside>

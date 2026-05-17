@@ -8,13 +8,13 @@
       (click)="selectSymbol(item.symbol)"
     >
       <div class="stock-info">
-        <span class="symbol">{{ item.displayName }}</span>
-        <span class="full-name">{{ item.symbol.replace('.NS', '') }}</span>
+        <span class="symbol font-bold">{{ item.displayName }}</span>
+        <span class="full-name text-secondary">{{ item.symbol }}</span>
       </div>
       <div class="stock-price text-right">
-        <span class="price mono">{{ formatCurrency(item.price) }}</span>
-        <span class="change mono" [ngClass]="item.changePercent >= 0 ? 'positive' : 'negative'">
-          {{ item.changePercent >= 0 ? '+' : '' }}{{ item.changePercent.toFixed(2) }}%
+        <span class="price mono">{{ item.price | number:'1.2-2' }}</span>
+        <span class="change mono text-xs" [ngClass]="item.changePercent >= 0 ? 'text-success' : 'text-danger'">
+          {{ item.changePercent >= 0 ? '+' : '' }}{{ item.changePercent | number:'1.2-2' }}%
         </span>
       </div>
     </div>
@@ -27,16 +27,16 @@
       <div class="stock-meta">
         <h2 class="mono">{{ stock.displayName }}</h2>
         <span class="divider">|</span>
-        <span class="price mono">{{ formatCurrency(stock.price) }}</span>
-        <span class="change mono" [ngClass]="stock.changePercent >= 0 ? 'positive' : 'negative'">
-          {{ stock.changePercent >= 0 ? '▲' : '▼' }} {{ stock.changePercent.toFixed(2) }}%
+        <span class="price mono">{{ stock.price | number:'1.2-2' }}</span>
+        <span class="change mono" [ngClass]="stock.changePercent >= 0 ? 'text-success' : 'text-danger'">
+          {{ stock.changePercent >= 0 ? '▲' : '▼' }} {{ stock.changePercent | number:'1.2-2' }}%
         </span>
       </div>
 
       <div class="range-selector">
         <button 
           *ngFor="let r of ranges" 
-          mat-button 
+          class="range-btn"
           [class.active]="r.range === selectedRange()"
           (click)="selectRange(r.range)"
         >
@@ -53,5 +53,16 @@
         [interval]="selectedInterval()"
       ></app-stock-chart>
     </div>
+
+    <!-- Sign-up CTA for Guest Users -->
+    <footer class="markets-cta" *ngIf="!authService.isAuthenticated()">
+      <div class="cta-banner">
+        <div class="cta-text">
+          <h3>Ready to start trading?</h3>
+          <p class="text-secondary text-sm">Create an account to execute sub-millisecond trades with our high-precision engine.</p>
+        </div>
+        <button class="btn-primary" routerLink="/auth">SIGN UP FREE</button>
+      </div>
+    </footer>
   </main>
 </div>

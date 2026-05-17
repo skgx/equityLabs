@@ -11,7 +11,6 @@ import in.equitylabs.orders.repository.OutboxRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -27,10 +26,10 @@ public class OrderService {
     private final OutboxRepository outboxRepository;
     private final ObjectMapper objectMapper;
 
-    @Transactional
     public Mono<OrderResponse> createOrder(OrderRequest request) {
         String orderId = UUID.randomUUID().toString();
-        
+        log.info("CREATING ORDER: ID={} | SYMBOL={} | QTY={}", orderId, request.getSymbol(), request.getQuantity());
+
         Order order = Order.builder()
                 .orderId(orderId)
                 .userId(request.getUserId())
@@ -43,12 +42,12 @@ public class OrderService {
                 .status("PENDING")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .isNew(true)
                 .build();
 
-        log.info("Creating order in database: {}", orderId);
-        order.setNew(true);
-
         return orderRepository.save(order)
+                .doOnSuccess(saved -> log.info("Order saved to DB: {}", saved.getOrderId()))
+                .doOnError(e -> log.error("ERROR SAVING ORDER: {}", e.getMessage()))
                 .flatMap(savedOrder -> {
                     try {
                         String payload = objectMapper.writeValueAsString(savedOrder);
@@ -60,7 +59,9 @@ public class OrderService {
                                 .createdAt(LocalDateTime.now())
                                 .build();
                         
-                        return outboxRepository.save(event);
+                        return outboxRepository.save(event)
+                                .doOnSuccess(e -> log.info("Outbox event saved: {}", e.getId()))
+                                .doOnError(e -> log.error("ERROR SAVING OUTBOX: {}", e.getMessage()));
                     } catch (JsonProcessingException e) {
                         return Mono.error(new RuntimeException("Failed to serialize order", e));
                     }
@@ -69,7 +70,15 @@ public class OrderService {
                         .orderId(orderId)
                         .status("ACCEPTED")
                         .message("Order accepted and queued for processing")
-                        .build());
+                        .build())
+                .onErrorResume(e -> {
+                    log.error("CRITICAL ORDER ERROR: {}", e.getMessage());
+                    return Mono.just(OrderResponse.builder()
+                            .orderId(orderId)
+                            .status("FAILED")
+                            .message("Failed to process order: " + e.getMessage())
+                            .build());
+                });
     }
 
     public Flux<Order> getOrdersByUser(String userId) {
